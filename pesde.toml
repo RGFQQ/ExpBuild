@@ -1,0 +1,21 @@
+name = "rgf/expbuild"
+version = "0.1.0"
+description = "luau bundler for executor scripts with support for macros"
+authors = ["SDOT"]
+license = "MIT"
+includes = ["bin.luau", "LICENSE", "README.md", "pesde.toml", ".luaurc"]
+
+[target]
+environment = "lune"
+bin = "bin.luau"
+
+[indices]
+default = "https://github.com/RGFQQ/pesde-index"
+pesde = "https://github.com/pesde-pkg/index"
+
+[dependencies]
+pathfs = { name = "jiwonz/pathfs", version = "^0.6.0-rc.1", index = "pesde" }
+unzip = { name = "0x5eal/unzip", version = "^0.1.1", target = "luau", index = "pesde" }
+
+[patches]
+"jiwonz/pathfs" = { "0.6.0-rc.1 lune" = "patches/jiwonz+pathfs-0.6.0-rc.1+lune.patch" }
