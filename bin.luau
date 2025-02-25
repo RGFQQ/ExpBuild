@@ -160,6 +160,8 @@ local function fileStylize(input: string)
 	local result = process.spawn(stylua, {
 		input,
 		"--verify",
+		"--syntax",
+		"Luau",
 	}, {
 		cwd = ROOT_DIR:toString(),
 		stdio = "default",
