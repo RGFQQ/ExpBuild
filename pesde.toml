@@ -1,5 +1,5 @@
 name = "rgf/expbuild"
-version = "0.2.1"
+version = "0.2.2"
 description = "luau bundler for executor scripts with support for macros"
 authors = ["SDOT"]
 license = "MPL 2.0"
@@ -15,7 +15,9 @@ repository = "https://github.com/RGFQQ/ExpBuild"
 
 [target]
 environment = "lune"
-bin = "bin.luau"
+
+[target.scripts]
+expbuild = "bin.luau"
 
 [indices]
 default = "https://github.com/RGFQQ/pesde-index"
