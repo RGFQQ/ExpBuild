@@ -35,6 +35,7 @@ local net = require("@lune/net")
 local pathfs = require("@lunepkg/pathfs")
 local process = require("@lune/process")
 local serde = require("@lune/serde")
+local json = require("./json")
 local stdio = require("@lune/stdio")
 local fs = pathfs.fs
 local unzip = require("@luaupkg/unzip")
@@ -71,13 +72,9 @@ local function randHash(str: string)
 end
 
 local function getFileInd(path: string)
-	--TODO: replace this monstrocity with regex
-	local comp = pathfs.Path.from(path)
-	local parent = comp:parent()
-	if parent then parent = tostring(parent:fileName()) end
-	local filename = tostring(comp:fileName())
+	local base = path:match("[\\/]?[a-zA-Z0-9_%-%.]*[\\/][a-zA-Z0-9_%-%.]+$") or "INVPATH"
 
-	return ((parent and parent .. "/") or "") .. filename .. "-" .. randHash(path)
+	return base .. "-" .. randHash(path)
 end
 
 -- dep downloads
@@ -136,7 +133,8 @@ local function astAnalyze(path: string): any
 	})
 	assert(result.ok, `failed to analyze {path}`)
 
-	return serde.decode("json", result.stdout)
+	-- TODO bug report serde
+	return json.decode(result.stdout) --serde.decode("json", result.stdout)
 end
 
 local function fileProcess(input: string, output: string, build_type: string, config: string, env_field: string, format: string?)
