@@ -270,7 +270,8 @@ local function getConfigAliases(config_path: pathfs.Path): { [string]: pathfs.Pa
 	local aliases = {}
 	local config = serde.decode("json", fs.readFile(config_path))
 	if config.aliases then
-		for alias, path: pathfs.Path in config.aliases do
+		for alias, path: string in config.aliases do
+			if path:match("^~") then continue end
 			aliases[alias] = resolvePath(path, nil, config_path:parent(), true)
 		end
 	end
