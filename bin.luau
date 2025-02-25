@@ -455,6 +455,12 @@ local function bundle(config: ExpBuildConfig)
 				end
 			end
 
+			if #req_code < (pos_end - pos_start) then
+				for i = 1, pos_end - (pos_start + #req_code) do
+					table.remove(new_content, pos_start + #req_code)
+				end
+			end
+
 			global_diff += diff
 		end
 
