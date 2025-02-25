@@ -1,5 +1,5 @@
 name = "rgf/expbuild"
-version = "0.2.0"
+version = "0.2.1"
 description = "luau bundler for executor scripts with support for macros"
 authors = ["SDOT"]
 license = "MPL 2.0"
@@ -11,6 +11,7 @@ includes = [
 	".luaurc",
 	"example.expbuild.toml",
 ]
+repository = "https://github.com/RGFQQ/ExpBuild"
 
 [target]
 environment = "lune"
