@@ -71,7 +71,7 @@ local function randHash(str: string)
 end
 
 local function getFileInd(path: string)
-	local base = path:match("[\\/]?[a-zA-Z0-9_%-%.]*[\\/][a-zA-Z0-9_%-%.]+$") or "INVPATH"
+	local base = (path:match("[\\/]?[a-zA-Z0-9_%-%.]*[\\/][a-zA-Z0-9_%-%.]+$") or "INVPATH"):gsub("\\", "/")
 
 	return base .. "-" .. randHash(path)
 end
@@ -182,17 +182,16 @@ local function getRangeFromLinePos(line: string, content: string)
 	local row_num = 0
 
 	for pos, char in utf8.codes(content) do
-		if utf8.char(char) == "\n" then
-			line_num += 1
-			row_num = 0
-			continue
-		end
-
 		if line_poses[1] == line_num and line_poses[2] == row_num then range_start = pos end
 		if line_poses[3] == line_num and line_poses[4] == row_num then range_end = pos end
 
 		if range_start and range_end then break end
 		row_num += 1
+		if utf8.char(char) == "\n" then
+			line_num += 1
+			row_num = 0
+			continue
+		end
 	end
 
 	return range_start, range_end
@@ -216,7 +215,7 @@ local function resolvePath(path_str: string | pathfs.Path, aliases: { [string]: 
 		path = (root or ROOT_DIR):join(path)
 	end
 
-	if raw then return path end
+	if raw then return pathfs.normalize(path) end
 
 	local resolved = nil
 
@@ -445,7 +444,6 @@ local function bundle(config: ExpBuildConfig)
 
 		local global_diff = 0
 		for _, info in requires do
-			print(table.concat(info[4]))
 			local pos_start, pos_end, diff, req_code = unpack(info)
 			pos_start, pos_end = pos_start + global_diff, pos_end + global_diff
 
