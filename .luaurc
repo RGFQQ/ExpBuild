@@ -2,12 +2,13 @@
 	"languageMode": "nonstrict",
 	"aliases": {
 		"lune": "~/.lune/.typedefs/0.8.9/",
-		"pkg": "./lune_packages/",
+		"lunepkg": "./lune_packages/",
 		"luaupkg": "./luau_packages/"
 	},
 	"lintErrors": false,
 	"typeErrors": false,
 	"lint": {
-		"*": true
+		"*": true,
+		"ForRange": false
 	}
 }

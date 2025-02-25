@@ -1,0 +1,7 @@
+column_width = 160
+call_parentheses = "Input"
+collapse_simple_statement = "ConditionalOnly"
+syntax = "Luau"
+
+[sort_requires]
+enabled = true

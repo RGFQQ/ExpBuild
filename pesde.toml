@@ -1,9 +1,16 @@
 name = "rgf/expbuild"
-version = "0.1.0"
+version = "0.2.0"
 description = "luau bundler for executor scripts with support for macros"
 authors = ["SDOT"]
-license = "MIT"
-includes = ["bin.luau", "LICENSE", "README.md", "pesde.toml", ".luaurc"]
+license = "MPL 2.0"
+includes = [
+	"bin.luau",
+	"LICENSE",
+	"README.md",
+	"pesde.toml",
+	".luaurc",
+	"example.expbuild.toml",
+]
 
 [target]
 environment = "lune"
@@ -14,8 +21,13 @@ default = "https://github.com/RGFQQ/pesde-index"
 pesde = "https://github.com/pesde-pkg/index"
 
 [dependencies]
-pathfs = { name = "jiwonz/pathfs", version = "^0.6.0-rc.1", index = "pesde" }
+pathfs = { name = "jiwonz/pathfs", version = "^0.6.0-rc.2", index = "pesde" }
 unzip = { name = "0x5eal/unzip", version = "^0.1.1", target = "luau", index = "pesde" }
+argparse = { name = "caveful_games/argparse", version = "^0.1.2", index = "pesde" }
 
-[patches]
-"jiwonz/pathfs" = { "0.6.0-rc.1 lune" = "patches/jiwonz+pathfs-0.6.0-rc.1+lune.patch" }
+[dev_dependencies]
+stylua = { name = "pesde/stylua", version = "^2.0.2", index = "pesde" }
+
+[engines]
+pesde = "^0.6.0"
+lune = "^0.8.9"

@@ -1,0 +1,22 @@
+var_prefix = "__EXPBUILD" # optional, what prefix should every expbuild related variable have
+env_field = "BUILDTYPE" # optional, what ENV field should be used for build type when using darklua
+
+# hashmap of build types and their configs 
+[buildtypes]
+
+[buildtypes.DEV]
+process_config = "./.darklua.json" # optional, default: ./.darklua.json, what darklua config should used on each file
+postprocess_config = "./.darklua.json" # optional, if valid path: darklua with the specified config will be ran on the bundle
+postprocess_stylua = true # optional, if true: the script will run stylua on the bundle
+# postprocess_script = "./.lune/obfuscate.luau" # optional, if valid path: will launch the specified script with lune
+
+[buildtypes.PROD]
+process_config = "./.darklua.json"
+# postprocess_config = "./.darklua.json"
+postprocess_stylua = false
+postprocess_script = "./ok.luau"
+
+[buildtypes.DEBUG]
+process_config = "./debug.darklua.json"
+postprocess_config = "./postdebug.darklua.json"
+postprocess_stylua = true
