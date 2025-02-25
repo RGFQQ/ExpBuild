@@ -35,7 +35,6 @@ local net = require("@lune/net")
 local pathfs = require("@lunepkg/pathfs")
 local process = require("@lune/process")
 local serde = require("@lune/serde")
-local json = require("./json")
 local stdio = require("@lune/stdio")
 local fs = pathfs.fs
 local unzip = require("@luaupkg/unzip")
@@ -131,10 +130,9 @@ local function astAnalyze(path: string): any
 		cwd = ROOT_DIR:toString(),
 		stdio = "default",
 	})
-	assert(result.ok, `failed to analyze {path}`)
+	assert(result.ok, `failed to analyze {path}\n{result.code}: {result.stdout}\n{result.stderr}`)
 
-	-- TODO bug report serde
-	return json.decode(result.stdout) --serde.decode("json", result.stdout)
+	return serde.decode("json", result.stdout)
 end
 
 local function fileProcess(input: string, output: string, build_type: string, config: string, env_field: string, format: string?)
@@ -151,7 +149,7 @@ local function fileProcess(input: string, output: string, build_type: string, co
 		env = { [env_field] = build_type },
 		stdio = "default",
 	})
-	assert(result.ok, `failed to process {input}`)
+	assert(result.ok, `failed to process {input}\n{result.code}: {result.stdout}\n{result.stderr}`)
 end
 
 local function fileStylize(input: string)
@@ -164,7 +162,7 @@ local function fileStylize(input: string)
 		cwd = ROOT_DIR:toString(),
 		stdio = "default",
 	})
-	assert(result.ok, `failed to stylize {input}`)
+	assert(result.ok, `failed to stylize {input}\n{result.code}: {result.stdout}\n{result.stderr}`)
 end
 
 local function getRangeFromLinePos(line: string, content: string)
@@ -215,7 +213,7 @@ local function resolvePath(path_str: string | pathfs.Path, aliases: { [string]: 
 	elseif path:startsWith("./") then
 		path = (root or ROOT_DIR):join(path:stripPrefix("./") :: pathfs.Path)
 	else
-		path = pathfs.canonicalize(path)
+		path = (root or ROOT_DIR):join(path)
 	end
 
 	if raw then return path end
@@ -286,7 +284,8 @@ local function extractAstRequires(analysis: any, path_buffer: { [string]: string
 				and v.func
 				and v.func.type == "AstExprGlobal"
 				and v.func.global == "require"
-				and v.args[1]
+				and v.args
+				and #v.args == 1
 				and v.args[1].type == "AstExprConstantString"
 			then
 				path_buffer[v.location] = v.args[1].value
@@ -314,11 +313,10 @@ local function fullAnalyze(path: pathfs.Path, processed_path: pathfs.Path?, root
 	local requires = {}
 
 	for _, str in comments do
-		local matched = string.match(str, "^%-%-bundle!([^\n%s]+)%s*$")
-		if matched then
-			macro = matched
-			break
-		end
+		local matched = string.match(str, "^%-%-macro!([^\n%s]+)%s*$")
+		if not macro then macro = matched end
+
+		if macro then break end
 	end
 
 	for range, req_path in raw_requires do
@@ -427,10 +425,29 @@ local function bundle(config: ExpBuildConfig)
 	end
 
 	for _, analysis in files do
+		local requires = {}
+		local new_content = analysis.content:split("")
+
 		for linepos, path in analysis.requires do
 			local pos_start, pos_end = getRangeFromLinePos(linepos, analysis.content)
 			local req_code = (`{config.prefix}_REQPOOL.require("{files[path:toString()].hash}")`):split("")
-			local new_content = analysis.content:split("")
+			table.insert(requires, {
+				pos_start,
+				pos_end,
+				#req_code - (pos_end - pos_start),
+				req_code,
+			})
+		end
+
+		table.sort(requires, function(c1, c2)
+			return c1[1] < c2[1]
+		end)
+
+		local global_diff = 0
+		for _, info in requires do
+			print(table.concat(info[4]))
+			local pos_start, pos_end, diff, req_code = unpack(info)
+			pos_start, pos_end = pos_start + global_diff, pos_end + global_diff
 
 			for i = 1, #req_code do
 				if pos_start + i - 1 >= pos_end then
@@ -440,9 +457,10 @@ local function bundle(config: ExpBuildConfig)
 				end
 			end
 
-			new_content = table.concat(new_content)
-			analysis.content = new_content
+			global_diff += diff
 		end
+
+		analysis.content = table.concat(new_content)
 	end
 
 	local full_file = `local {config.prefix}_REQPOOL = \{}\n`
