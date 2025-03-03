@@ -71,7 +71,7 @@ local function randHash(str: string)
 end
 
 local function getFileInd(path: string)
-	local base = (path:match("[\\/]?[a-zA-Z0-9_%-%.]*[\\/][a-zA-Z0-9_%-%.]+$") or "INVPATH"):gsub("\\", "/")
+	local base = (path:match("[\\/]?[^\\/]]*[\\/][^\\/]]+$") or "INVPATH"):gsub("\\", "/")
 
 	return base .. "-" .. randHash(path)
 end
@@ -485,8 +485,6 @@ local function bundle(config: ExpBuildConfig)
 		fileProcess(output_path:toString(), output_path:toString(), config.build_type, config.postprocess_config, config.env_field, config.format)
 	end
 
-	if config.stylize then fileStylize(output_path:toString()) end
-
 	if config.postprocess_script then
 		local script_process = process.spawn("lune", {
 			"run",
@@ -497,8 +495,10 @@ local function bundle(config: ExpBuildConfig)
 			cwd = ROOT_DIR:toString(),
 			stdio = "inherit",
 		})
-		if not script_process.ok then warn(`failed to run postprocess script, error code {script_process.code}`) end
+		if not script_process.ok then warn(`failed to run postprocess script, error code {script_process.code}\n{script_process.stderr}`) end
 	end
+
+	if config.stylize then fileStylize(output_path:toString()) end
 
 	return output_path:toString()
 end
