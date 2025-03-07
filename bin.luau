@@ -507,7 +507,7 @@ local parser = argparse("ExpBuild", "Luau file bundler with support for macros")
 parser:argument("input", "entrypoint for a bundle", "src/init.luau"):args(1)
 parser:option("-t --type", "build type that will be passed to the global"):count(1):argname("<build_type>")
 parser:flag("-s --stylize", "should the bundle be postprocessed with stylua"):count("0-1"):target("stylize")
-parser:option("-f --format", "formatting style override for a bundle", "retain_lines"):count(1):argname(`<{table.concat(BUILD_FORMATS, " | ")}>`)
+parser:option("-f --format", "formatting style override for a bundle"):count("0-1"):argname(`<{table.concat(BUILD_FORMATS, " | ")}>`)
 
 local args = parser:parse(process.args)
 
@@ -536,7 +536,7 @@ local build_config = {
 	build_type = build_type,
 	format = args.format,
 	prefix = expbuild_file.var_prefix,
-	stylize = if expbuild_config.postprocess_stylua == nil then expbuild_config.postprocess_stylua else args.stylize,
+	stylize = if expbuild_config.postprocess_stylua == nil then args.stylize else expbuild_config.postprocess_stylua,
 	env_field = expbuild_file.env_field,
 	process_config = if expbuild_config.process_config == nil then DEFAULT_EXPBUILD_PROCESS_CONFIG_PATH else expbuild_config.process_config,
 	postprocess_config = expbuild_config.postprocess_config,
