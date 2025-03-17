@@ -15,6 +15,7 @@ repository = "https://github.com/RGFQQ/ExpBuild"
 
 [target]
 environment = "lune"
+bin = "bin.luau"
 
 [target.scripts]
 expbuild = "bin.luau"
