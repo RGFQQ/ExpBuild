@@ -70,16 +70,18 @@ local function randHash(str: string)
 	})
 end
 
-local function getFileInd(path: Path)
-	local parent = tostring(path:parent())
+local function getFileInd(path: pathfs.Path): string
+	local parent_path = path:parent()
 	local name = tostring(path:fileStem())
 	local ext = tostring(path:extension())
-	local has_parent = parent ~= "nil"
+	local has_name = name ~= "nil"
+	local has_parent = parent_path
 	local has_ext = ext ~= "nil"
+	local parent_name = if has_parent then parent_path:fileName() else nil
 
-	local full = if name then ((if has_parent then parent .. "/" else "") .. name .. (if has_ext then ext else "")) else "INVPATH"
+	local full = if has_name then ((if has_parent then parent_name .. "/" else "") .. name .. (if has_ext then "." .. ext else "")) else "INVPATH"
 
-	return full .. "-" .. randHash(path)
+	return full .. "-" .. randHash(path:toString())
 end
 
 -- dep downloads
