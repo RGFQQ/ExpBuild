@@ -1,5 +1,5 @@
 name = "rgf/expbuild"
-version = "0.2.10"
+version = "0.2.11"
 description = "luau bundler for executor scripts with support for macros"
 authors = ["SDOT"]
 license = "MPL 2.0"
