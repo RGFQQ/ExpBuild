@@ -170,7 +170,7 @@ local function fileStylize(input: string)
 		cwd = ROOT_DIR:toString(),
 		stdio = "default",
 	})
-	assert(result.ok, `failed to stylize {input}\n{result.code}: {result.stdout}\n{result.stderr}`)
+	if not result.ok then warn(`failed to stylize {input}\n{result.code}: {result.stdout}\n{result.stderr}`) end
 end
 
 local function getRangeFromLinePos(line: string, content: string)
